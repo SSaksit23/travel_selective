@@ -1,0 +1,516 @@
+// backend/package.json
+{
+  "name": "tour-operator-backend",
+  "version": "1.0.0",
+  "description": "Tour Operator Backend with Amadeus API Integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": ["travel", "amadeus", "tour-operator", "booking", "flights", "hotels", "docker"],
+  "author": "Tour Operator System",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "amadeus": "^8.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "redis": "^4.6.8",
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "express-rate-limit": "^6.10.0",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "joi": "^17.9.2",
+    "axios": "^1.5.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.4",
+    "supertest": "^6.3.3",
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
+
+---
+
+// frontend/package.json
+{
+  "name": "tour-operator-frontend",
+  "version": "1.0.0",
+  "description": "Tour Operator Frontend with Map Integration",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4",
+    "leaflet": "^1.9.4",
+    "axios": "^1.5.0",
+    "lucide-react": "^0.263.1",
+    "react-datepicker": "^4.16.0",
+    "date-fns": "^2.30.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.3",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.28",
+    "@types/leaflet": "^1.9.6"
+  },
+  "proxy": "http://backend:5000"
+}
+
+---
+
+// frontend/tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'amadeus-blue': '#3b82f6',
+        'amadeus-dark': '#1e40af',
+      },
+      fontFamily: {
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      }
+    },
+  },
+  plugins: [],
+}
+
+---
+
+// frontend/postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+---
+
+// frontend/src/index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+---
+
+// frontend/src/index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+---
+
+// .env.example
+# Environment Configuration Example
+# Copy this file to .env and fill in your actual values
+
+# =================
+# AMADEUS API CREDENTIALS
+# =================
+# Get these from https://developers.amadeus.com
+AMADEUS_CLIENT_ID=Bd76Zxmr3DtsAgSCNVhRlgCzzFDROM07
+AMADEUS_CLIENT_SECRET=Onw33473vAI1CTHS
+AMADEUS_HOSTNAME=test
+
+# =================
+# SERVER CONFIGURATION
+# =================
+NODE_ENV=development
+PORT=5000
+
+# =================
+# DATABASE CONFIGURATION
+# =================
+DATABASE_URL=postgresql://tour_operator:secure_password@postgres:5432/tour_operator_db
+
+# =================
+# REDIS CONFIGURATION
+# =================
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# =================
+# SECURITY
+# =================
+JWT_SECRET=your_super_secure_jwt_secret_change_in_production
+CORS_ORIGIN=http://localhost:3000
+
+# =================
+# FRONTEND CONFIGURATION
+# =================
+REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_ENVIRONMENT=development
+
+---
+
+# README.md
+# 🛫 Tour Operator System with Amadeus API Integration
+
+A complete tour operator booking system with flight search, hotel booking, and interactive maps powered by Amadeus APIs.
+
+## ✨ Features
+
+### 🛫 Flight Search
+- **Real-time flight search** using Amadeus Flight Offers Search API
+- **Interactive route maps** showing origin and destination
+- **Flexible search options**: Round-trip/One-way, multiple passengers, travel classes
+- **Smart city/airport search** with autocomplete
+- **Comprehensive results** with pricing, duration, and airline details
+
+### 🏨 Hotel Search
+- **Hotel search by city** with availability and pricing
+- **Interactive maps** showing hotel locations
+- **Auto-linking** from flight destination for seamless booking flow
+- **Detailed hotel information** with ratings, amenities, and room options
+- **Multi-room and guest configuration**
+
+### 🗺️ Map Integration
+- **Flight route visualization** with origin/destination markers
+- **Hotel location mapping** with clickable markers
+- **City center and hotel position display**
+- **Responsive maps** using Leaflet (no API key required)
+
+### 🐳 Docker Ready
+- **Complete containerization** with Docker Compose
+- **Multi-service architecture**: Frontend, Backend, Database, Cache
+- **Development and production** configurations
+- **Automatic service orchestration**
+
+## 🚀 Quick Start with Docker
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Git
+
+### 1. Clone and Setup
+```bash
+# Create project directory
+mkdir tour-operator-system
+cd tour-operator-system
+
+# Create the directory structure
+mkdir -p backend frontend database nginx
+
+# Copy all the provided files to their respective directories
+# (backend files to ./backend/, frontend files to ./frontend/, etc.)
+```
+
+### 2. Environment Setup
+```bash
+# Copy environment configuration
+cp .env.example .env
+
+# The .env file is already configured with your Amadeus API keys:
+# AMADEUS_CLIENT_ID=Bd76Zxmr3DtsAgSCNVhRlgCzzFDROM07
+# AMADEUS_CLIENT_SECRET=Onw33473vAI1CTHS
+```
+
+### 3. Start the System
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Check service status
+docker-compose ps
+```
+
+### 4. Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000/api
+- **Database Admin (pgAdmin)**: http://localhost:8080
+  - Email: admin@touroperator.com
+  - Password: admin123
+
+## 📁 Project Structure
+
+```
+tour-operator-system/
+├── docker-compose.yml
+├── .env
+├── README.md
+├── backend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js
+│   └── ...
+├── frontend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── public/
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── components/
+│   │   │   ├── FlightSearchWithMap.js
+│   │   │   ├── HotelSearchWithMap.js
+│   │   │   └── MapComponent.js
+│   │   └── ...
+├── database/
+│   └── init.sql
+└── nginx/
+    └── nginx.conf
+```
+
+## 🔧 API Endpoints
+
+### Flight APIs
+- `POST /api/flights/search` - Search flights
+- `POST /api/flights/price` - Get flight pricing details
+
+### Hotel APIs
+- `GET /api/hotels/search` - Search hotels by city
+- `GET /api/hotels/:hotelId` - Get hotel details
+
+### Location APIs
+- `GET /api/locations/search` - Search airports/cities
+- `GET /api/locations/:iataCode/coordinates` - Get coordinates
+- `GET /api/locations/route-map` - Get route map data
+
+### Utility APIs
+- `GET /api/health` - Health check
+- `GET /api/airports/:iataCode` - Airport information
+
+## 🗺️ Map Features
+
+### Flight Maps
+- **Route visualization** between origin and destination
+- **Airport markers** with departure/arrival icons
+- **Flight path** with dashed line animation
+- **Popup information** with airport and city details
+
+### Hotel Maps
+- **City center** marker showing destination
+- **Hotel markers** for all available properties
+- **Selected hotel highlighting** with special icon
+- **Detailed popups** with hotel information and ratings
+
+## 💡 Usage Examples
+
+### Basic Flight Search
+1. Enter departure city (e.g., "Madrid")
+2. Enter destination city (e.g., "Barcelona")
+3. Select departure date
+4. Choose round-trip or one-way
+5. Click "Search Flights"
+6. View results with interactive route map
+
+### Hotel Search with Flight Integration
+1. Complete a flight search first
+2. Switch to "Hotels" tab
+3. Destination auto-populated from flight
+4. Select check-in/check-out dates
+5. Configure guests and rooms
+6. View hotels with location map
+
+## 🔒 Security Features
+
+- **API key security** with environment variables
+- **CORS protection** for cross-origin requests
+- **Input validation** and sanitization
+- **Database connection security**
+- **Redis authentication** ready
+
+## 📊 Performance Optimizations
+
+- **Redis caching** for API responses
+- **Database indexing** for fast queries
+- **Response compression** with gzip
+- **Image optimization** for maps
+- **Lazy loading** for components
+
+## 🛠️ Development Commands
+
+```bash
+# Start development environment
+docker-compose up
+
+# Rebuild services
+docker-compose build
+
+# View service logs
+docker-compose logs backend
+docker-compose logs frontend
+
+# Access database
+docker-compose exec postgres psql -U tour_operator -d tour_operator_db
+
+# Access Redis
+docker-compose exec redis redis-cli
+
+# Stop all services
+docker-compose down
+
+# Remove all data (careful!)
+docker-compose down -v
+```
+
+## 🌍 Production Deployment
+
+### Environment Setup
+```bash
+# Update environment for production
+NODE_ENV=production
+AMADEUS_HOSTNAME=production  # Switch to production Amadeus API
+DATABASE_URL=your_production_database_url
+REDIS_HOST=your_production_redis_host
+```
+
+### SSL Configuration
+The system is ready for SSL termination at the Nginx level. Update the nginx configuration for HTTPS.
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **API Connection Issues**
+   - Verify Amadeus API credentials
+   - Check network connectivity
+   - Review API quota limits
+
+2. **Map Not Loading**
+   - Ensure Leaflet CSS is loaded
+   - Check browser console for errors
+   - Verify coordinate data
+
+3. **Database Connection**
+   - Check PostgreSQL service status
+   - Verify connection string
+   - Review database logs
+
+4. **Redis Cache Issues**
+   - Check Redis service health
+   - Clear cache if needed: `docker-compose exec redis redis-cli FLUSHALL`
+
+## 📝 API Limits
+
+**Amadeus Test Environment:**
+- **Flight Offers Search**: 10,000 calls/month
+- **Hotel Search**: 10,000 calls/month
+- **Location Search**: 10,000 calls/month
+
+**Rate Limits:**
+- 10 requests per second per API
+
+## 🔮 Future Enhancements
+
+- **Payment integration** (Stripe/PayPal)
+- **User authentication** and profiles
+- **Booking management** system
+- **Email notifications**
+- **Multi-language support**
+- **Mobile app** development
+- **Advanced filtering** options
+- **Price alerts** and tracking
+
+## 📞 Support
+
+For issues related to:
+- **Amadeus API**: https://developers.amadeus.com/support
+- **Docker**: https://docs.docker.com/
+- **Application**: Check logs with `docker-compose logs`
+
+## 📄 License
+
+This project is licensed under the ISC License. See the LICENSE file for details.
+
+---
+
+**🎉 Your tour operator system is now ready to run with Docker!**
+
+The system uses your provided Amadeus API keys and includes complete map integration for both flights and hotels. Simply run `docker-compose up` and access http://localhost:3000 to start using the application.
